@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rotordarts</title>
+  <link rel="stylesheet" href="src/ui/dartboard.css">
+  <link rel="stylesheet" href="src/ui/player-manager.css">
+  <link rel="stylesheet" href="src/ui/app.css">
+</head>
+<body>
+  <header><h1>Rotordarts</h1><span id="rules-label"></span></header>
+
+  <main id="setup" hidden>
+    <div id="setup-rules"></div>
+    <div id="setup-players"></div>
+    <button id="start" class="primary">Start game</button>
+  </main>
+
+  <main id="game" hidden>
+    <div class="game-board">
+      <p id="status" role="status"></p>
+      <div id="board"></div>
+      <div class="controls">
+        <button id="miss">Miss</button>
+        <button id="undo">Undo</button>
+        <button id="rematch" class="primary" hidden>Rematch</button>
+        <button id="new-game">New game</button>
+      </div>
+    </div>
+    <div id="scoreboard"></div>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

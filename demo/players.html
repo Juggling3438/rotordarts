@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rotordarts – Player management demo</title>
+  <link rel="stylesheet" href="../src/ui/player-manager.css">
+  <style>
+    body { margin: 0; padding: 1rem; background: #2e333b; color: #eee; font-family: system-ui, sans-serif; }
+    main { width: min(480px, 100%); margin: 0 auto; display: grid; gap: 1rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="pm"></div>
+    <pre id="out"></pre>
+  </main>
+  <script type="module">
+    import { createPlayerManager } from '../src/ui/player-manager.js';
+    const out = document.getElementById('out');
+    const show = (sel) => { out.textContent = 'Playing: ' + (sel.map((p) => p.name).join(', ') || '–'); };
+    const pm = createPlayerManager({ onChange: show });
+    document.getElementById('pm').append(pm.element);
+    show(pm.getSelected());
+  </script>
+</body>
+</html>

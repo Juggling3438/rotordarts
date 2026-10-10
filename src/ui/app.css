@@ -1,0 +1,51 @@
+:root { --bg: #2e333b; --panel: #383e48; --line: #1b1e23; --accent: #dc5753; --ok: #528f6f; --text: #eee; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+[hidden] { display: none !important; }
+
+header { display: flex; align-items: baseline; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line); }
+header h1 { margin: 0; font-size: 1.25rem; }
+#rules-label { color: #aab; margin-left: auto; }
+
+main { max-width: 1000px; margin: 0 auto; padding: 1rem; }
+#setup { display: grid; gap: 1rem; max-width: 520px; }
+#game { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr); align-items: start; }
+@media (max-width: 760px) { #game { grid-template-columns: 1fr; } }
+
+button {
+  font: inherit; padding: .6rem 1.1rem; color: inherit; cursor: pointer;
+  background: var(--panel); border: 1px solid var(--line); border-radius: .5rem;
+}
+button:hover:not(:disabled) { background: var(--ok); }
+button:disabled { opacity: .4; cursor: default; }
+button.primary { background: var(--accent); }
+button.primary:hover:not(:disabled) { background: #e8706c; }
+
+.rules-menu { background: var(--panel); border-radius: .75rem; padding: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.rules-menu h2 { flex-basis: 100%; margin: 0; font-size: 1.1rem; }
+.rules-menu fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.rules-menu legend { float: left; margin-right: .5rem; color: #aab; padding: 0; }
+.rules-menu label { cursor: pointer; }
+.rules-menu input { position: absolute; opacity: 0; }
+.rules-menu label span { display: inline-block; padding: .4rem .8rem; background: var(--bg); border: 1px solid var(--line); border-radius: .5rem; }
+.rules-menu input:checked + span { background: var(--ok); }
+.rules-menu input:focus-visible + span { outline: 2px solid #ffd54f; }
+
+.game-board { display: grid; gap: .75rem; }
+#status { margin: 0; font-size: 1.15rem; text-align: center; min-height: 1.5em; }
+#status.is-win { color: #ffd54f; font-weight: 700; }
+.controls { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+
+.scoreboard { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.sb-player {
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name score" "darts score" "avg score";
+  gap: .1rem 1rem; padding: .75rem 1rem; background: var(--panel); border-left: .4rem solid transparent; border-radius: .5rem;
+}
+.sb-player.is-current { border-left-color: var(--accent); background: #444b57; }
+.sb-player.is-winner { border-left-color: #ffd54f; }
+.sb-name { grid-area: name; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sb-darts { grid-area: darts; min-height: 1.2em; font-variant-numeric: tabular-nums; white-space: pre; color: #ffd54f; }
+.sb-darts.is-finished { color: #8d96a6; }
+.sb-darts.is-bust { color: #ff9a96; }
+.sb-avg { grid-area: avg; font-size: .85rem; color: #aab; }
+.sb-score { grid-area: score; align-self: center; font-size: 2.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }

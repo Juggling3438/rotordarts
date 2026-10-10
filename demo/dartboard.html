@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rotordarts – Dartboard demo</title>
+  <link rel="stylesheet" href="../src/ui/dartboard.css">
+  <style>
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center; gap: 1rem;
+      font-family: system-ui, sans-serif; background: #2e333b; color: #eee; padding: 1rem;
+    }
+    main { width: min(560px, 100%); display: grid; gap: 1rem; }
+    .controls { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+    button {
+      font: inherit; padding: .5rem 1rem; border-radius: .5rem; border: 1px solid #444;
+      background: #2a2a2a; color: inherit; cursor: pointer;
+    }
+    button:hover { background: #333; }
+    #turn { font-variant-numeric: tabular-nums; font-size: 1.25rem; margin-left: auto; }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="board"></div>
+    <div class="controls">
+      <button id="miss">Miss</button>
+      <button id="clear">Clear</button>
+      <label><input type="checkbox" id="disable"> Disabled</label>
+      <span id="turn">–</span>
+    </div>
+  </main>
+  <script type="module">
+    import { createDartboard } from '../src/ui/dartboard.js';
+    import { dart, dartLabel } from '../src/engine/darts-engine.js';
+
+    let darts = [];
+    const turnEl = document.getElementById('turn');
+
+    const render = () => {
+      const total = darts.reduce((sum, d) => sum + d.value, 0);
+      turnEl.textContent = darts.length ? `${darts.map(dartLabel).join('  ')}  = ${total}` : '–';
+    };
+
+    // A full turn is reset on the next dart; the board has already drawn this dart's marker.
+    const record = (d, point) => {
+      if (darts.length === 3) {
+        darts = [];
+        board.clearMarkers();
+        if (point) board.addMarker(point);
+      }
+      darts.push(d);
+      render();
+    };
+
+    const board = createDartboard({ onThrow: record });
+    document.getElementById('board').append(board.element);
+
+    document.getElementById('miss').onclick = () => record(dart(0));
+    document.getElementById('clear').onclick = () => { darts = []; board.clearMarkers(); render(); };
+    document.getElementById('disable').onchange = (e) => board.setDisabled(e.target.checked);
+  </script>
+</body>
+</html>

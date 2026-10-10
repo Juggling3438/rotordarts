@@ -1,0 +1,78 @@
+.dartboard {
+  --db-bg: #2e333b;
+  --db-wire: #1b1e23;
+  --db-dark: #2e333b;
+  --db-dark-hover: #424852;
+  --db-light: #ffe4d4;
+  --db-light-hover: #fff3ea;
+  --db-red: #dc5753;
+  --db-red-hover: #ee7773;
+  --db-green: #528f6f;
+  --db-green-hover: #6aaa88;
+  --db-hit: #ffd54f;
+
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 1;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation; /* no double-tap zoom on mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dartboard .board-surround { fill: var(--db-bg); }
+
+.dartboard .segment {
+  stroke: var(--db-wire);
+  stroke-width: 0.6;
+  transition: fill 80ms ease;
+}
+
+.dartboard .single.dark { fill: var(--db-dark); }
+.dartboard .single.light { fill: var(--db-light); }
+.dartboard :is(.triple, .double).dark { fill: var(--db-red); }
+.dartboard :is(.triple, .double).light { fill: var(--db-green); }
+.dartboard .single-bull { fill: var(--db-green); }
+.dartboard .double-bull { fill: var(--db-red); }
+
+@media (hover: hover) {
+  .dartboard .single.dark:hover { fill: var(--db-dark-hover); }
+  .dartboard .single.light:hover { fill: var(--db-light-hover); }
+  .dartboard :is(.triple, .double).dark:hover,
+  .dartboard .double-bull:hover { fill: var(--db-red-hover); }
+  .dartboard :is(.triple, .double).light:hover,
+  .dartboard .single-bull:hover { fill: var(--db-green-hover); }
+}
+
+.dartboard .segment.hit { animation: db-hit 350ms ease-out; }
+
+@keyframes db-hit {
+  from { fill: var(--db-hit); }
+}
+
+.dartboard .number {
+  fill: #eee;
+  font: 600 18px system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.dartboard .marker {
+  fill: var(--db-hit);
+  stroke: #000;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.dartboard.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dartboard .segment { transition: none; }
+  .dartboard .segment.hit { animation: none; }
+}

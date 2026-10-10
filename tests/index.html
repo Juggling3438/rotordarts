@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Rotordarts – Tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #111; color: #eee; padding: 2rem; }
+    .pass { color: #4ade80; } .fail { color: #f87171; }
+    li { margin: .2rem 0; } small { color: #aaa; display: block; margin-left: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>Rotordarts tests</h1>
+  <p id="summary">Running…</p>
+  <ul id="results"></ul>
+  <script type="module">
+    import { run } from './harness.js';
+    import './darts-engine.test.js';
+    import './players.test.js';
+    import './dartboard.test.js';
+    import './player-manager.test.js';
+    import './ui.test.js';
+
+    const results = await run();
+    const failed = results.filter((r) => !r.passed);
+    const list = document.getElementById('results');
+    for (const r of results) {
+      const li = document.createElement('li');
+      li.className = r.passed ? 'pass' : 'fail';
+      li.textContent = `${r.passed ? '✔' : '✘'} ${r.name}`;
+      if (r.error) {
+        const s = document.createElement('small');
+        s.textContent = r.error;
+        li.append(s);
+      }
+      list.append(li);
+    }
+    const summary = document.getElementById('summary');
+    summary.textContent = `${results.length - failed.length}/${results.length} passed`;
+    summary.className = failed.length ? 'fail' : 'pass';
+  </script>
+</body>
+</html>
