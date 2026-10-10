@@ -11,14 +11,57 @@ export const BULL = 25;
 export const MISS = 0;
 
 /** Create a validated rule set. */
-export function createRules({ startScore = 501, outMode = OUT_MODES.DOUBLE } = {}) {
+export function createRules({
+  startScore = 501,
+  outMode = OUT_MODES.DOUBLE,
+  faecher = false,
+  oppositeBull = false,
+} = {}) {
   if (!START_SCORES.includes(startScore)) {
     throw new Error(`Invalid start score: ${startScore}`);
   }
   if (!Object.values(OUT_MODES).includes(outMode)) {
     throw new Error(`Invalid out mode: ${outMode}`);
   }
-  return Object.freeze({ startScore, outMode });
+  return Object.freeze({ startScore, outMode, faecher: Boolean(faecher), oppositeBull: Boolean(oppositeBull) });
+}
+
+/** Segments in clockwise order around the board (starting at 20). */
+export const BOARD_RING = Object.freeze([20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5]);
+
+/**
+ * Custom rule "Fächer": three numbered darts (no bull / miss) whose board offset
+ * between consecutive darts is identical. Then every dart counts the highest segment.
+ */
+export function isFaecher(darts) {
+  if (darts.length !== DARTS_PER_TURN) return false;
+  if (darts.some((d) => d.segment === MISS || d.segment === BULL)) return false;
+  const [a, b, c] = darts.map((d) => BOARD_RING.indexOf(d.segment));
+  const n = BOARD_RING.length;
+  return (b - a + n) % n === (c - b + n) % n;
+}
+
+/**
+ * Custom rule "Opposite double bull": the first two darts are doubles on opposite
+ * segments of the board (e.g. D1 + D19) and the third dart is the double bull.
+ */
+export function isOppositeDoubleBull(darts) {
+  if (darts.length !== DARTS_PER_TURN) return false;
+  const [a, b, c] = darts;
+  if (a.multiplier !== 2 || b.multiplier !== 2) return false;
+  if (a.segment === BULL || a.segment === MISS || b.segment === BULL || b.segment === MISS) return false;
+  if (c.segment !== BULL || c.multiplier !== 2) return false;
+  const half = BOARD_RING.length / 2;
+  return (BOARD_RING.indexOf(a.segment) + half) % BOARD_RING.length === BOARD_RING.indexOf(b.segment);
+}
+
+/** Point value of each dart in a turn, applying custom rules. */
+export function turnValues(darts, rules) {
+  if (rules.faecher && isFaecher(darts)) {
+    const top = Math.max(...darts.map((d) => d.segment));
+    return darts.map((d) => top * d.multiplier);
+  }
+  return darts.map((d) => d.value);
 }
 
 /**
@@ -84,10 +127,12 @@ export function throwDart(state, d) {
 
   const index = state.currentPlayerIndex;
   const player = state.players[index];
-  const remaining = player.score - d.value;
   const darts = [...state.turn.darts, d];
-  const bust = isBust(remaining, d, state.rules.outMode);
-  const checkout = !bust && remaining === 0;
+  const values = turnValues(darts, state.rules);
+  const instantWin = Boolean(state.rules.oppositeBull) && isOppositeDoubleBull(darts);
+  const remaining = instantWin ? 0 : state.turn.startScore - values.reduce((s, v) => s + v, 0);
+  const bust = !instantWin && isBust(remaining, d, state.rules.outMode);
+  const checkout = instantWin || (!bust && remaining === 0);
   const turnOver = bust || checkout || darts.length === DARTS_PER_TURN;
 
   const newScore = bust ? state.turn.startScore : remaining;
@@ -102,6 +147,7 @@ export function throwDart(state, d) {
     playerId: player.id,
     darts,
     bust,
+    values,
     scoreBefore: state.turn.startScore,
     scoreAfter: newScore,
   };

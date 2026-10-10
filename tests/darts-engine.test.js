@@ -1,7 +1,7 @@
 import { test, assert } from './harness.js';
 import {
   createRules, createGame, dart, dartLabel, throwDart, undoDart, isBust,
-  getCurrentPlayer, threeDartAverage, OUT_MODES,
+  getCurrentPlayer, threeDartAverage, OUT_MODES, isFaecher, turnValues, isOppositeDoubleBull,
 } from '../src/engine/darts-engine.js';
 
 const players = [{ id: 'a', name: 'Alice' }, { id: 'b', name: 'Bob' }];
@@ -18,7 +18,64 @@ function withScore(state, score) {
 
 // --- rules ---
 test('rules default to 501 double out', () => {
-  assert.deepEqual(createRules(), { startScore: 501, outMode: 'double' });
+  assert.deepEqual(createRules(), { startScore: 501, outMode: 'double', faecher: false, oppositeBull: false });
+});
+
+// --- custom rule: opposite double bull ---
+test('isOppositeDoubleBull needs opposite doubles then bull', () => {
+  assert.ok(isOppositeDoubleBull([dart(1, 2), dart(19, 2), dart(25, 2)]));
+  assert.ok(isOppositeDoubleBull([dart(19, 2), dart(1, 2), dart(25, 2)]));
+  assert.ok(isOppositeDoubleBull([dart(20, 2), dart(3, 2), dart(25, 2)]));
+  assert.ok(!isOppositeDoubleBull([dart(1, 2), dart(18, 2), dart(25, 2)])); // not opposite
+  assert.ok(!isOppositeDoubleBull([dart(1, 2), dart(19, 1), dart(25, 2)])); // single
+  assert.ok(!isOppositeDoubleBull([dart(1, 2), dart(19, 2), dart(25, 1)])); // single bull
+  assert.ok(!isOppositeDoubleBull([dart(1, 2), dart(25, 2), dart(19, 2)])); // wrong order
+});
+test('opposite double bull is an instant win when enabled', () => {
+  const rules = createRules({ oppositeBull: true });
+  const s = throwAll(createGame(rules, players), [dart(1, 2), dart(19, 2), dart(25, 2)]);
+  assert.equal(s.winnerId, 'a');
+  assert.equal(s.players[0].score, 0);
+});
+test('opposite double bull does nothing when disabled', () => {
+  const s = throwAll(createGame(createRules(), players), [dart(1, 2), dart(19, 2), dart(25, 2)]);
+  assert.equal(s.winnerId, null);
+  assert.equal(s.players[0].score, 501 - 2 - 38 - 50);
+});
+test('opposite double bull instant win can be undone', () => {
+  const rules = createRules({ oppositeBull: true });
+  let s = throwAll(createGame(rules, players), [dart(1, 2), dart(19, 2), dart(25, 2)]);
+  s = undoDart(s);
+  assert.equal(s.winnerId, null);
+  assert.equal(s.players[0].score, 501 - 40);
+});
+
+// --- custom rule: Fächer ---
+test('isFaecher detects equal board offset', () => {
+  assert.ok(isFaecher([dart(20), dart(1), dart(18)]));
+  assert.ok(isFaecher([dart(20), dart(6, 2), dart(3, 3)])); // 20, 6, 3: offset 5
+  assert.ok(!isFaecher([dart(20), dart(1), dart(4)]));
+  assert.ok(!isFaecher([dart(20), dart(25), dart(18)]));
+  assert.ok(!isFaecher([dart(20), dart(1)]));
+});
+test('Fächer: 20+1+18 scores 60', () => {
+  const rules = createRules({ faecher: true });
+  const s = throwAll(createGame(rules, players), [dart(20), dart(1), dart(18)]);
+  assert.equal(s.players[0].score, 441);
+});
+test('Fächer keeps multipliers: 20 + D6 + T3 = 20 + D20 + T20', () => {
+  const rules = createRules({ faecher: true });
+  assert.deepEqual(turnValues([dart(20), dart(6, 2), dart(3, 3)], rules), [20, 40, 60]);
+});
+test('Fächer off: normal scoring', () => {
+  const s = throwAll(createGame(createRules(), players), [dart(20), dart(1), dart(18)]);
+  assert.equal(s.players[0].score, 462);
+});
+test('Fächer undo works', () => {
+  const rules = createRules({ faecher: true });
+  let s = throwAll(createGame(rules, players), [dart(20), dart(1), dart(18)]);
+  s = undoDart(s);
+  assert.equal(s.players[0].score, 501 - 21);
 });
 test('rules reject invalid values', () => {
   assert.throws(() => createRules({ startScore: 400 }));

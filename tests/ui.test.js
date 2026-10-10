@@ -12,7 +12,7 @@ const pick = (menu, name, value) => {
 
 test('rules menu defaults to 501 double out', () => {
   const menu = createRulesMenu({ storage: createMemoryStorage() });
-  assert.deepEqual(menu.getRules(), { startScore: 501, outMode: 'double' });
+  assert.deepEqual(menu.getRules(), { startScore: 501, outMode: 'double', faecher: false, oppositeBull: false });
   assert.ok(menu.element.querySelector('input[value="501"]').checked);
 });
 
@@ -22,15 +22,36 @@ test('rules menu changes rules, notifies and persists', () => {
   const menu = createRulesMenu({ storage, onChange: (r) => seen.push(r) });
   pick(menu, 'startScore', 301);
   pick(menu, 'outMode', 'straight');
-  assert.deepEqual(menu.getRules(), { startScore: 301, outMode: 'straight' });
+  const expected = { startScore: 301, outMode: 'straight', faecher: false, oppositeBull: false };
+  assert.deepEqual(menu.getRules(), expected);
   assert.equal(seen.length, 2);
-  assert.deepEqual(loadRules(storage), { startScore: 301, outMode: 'straight' });
-  assert.deepEqual(createRulesMenu({ storage }).getRules(), { startScore: 301, outMode: 'straight' });
+  assert.deepEqual(loadRules(storage), expected);
+  assert.deepEqual(createRulesMenu({ storage }).getRules(), expected);
+});
+
+test('rules menu toggles custom rule Fächer and persists it', () => {
+  const storage = createMemoryStorage();
+  const menu = createRulesMenu({ storage });
+  const box = menu.element.querySelector('.custom-rules input[type="checkbox"]');
+  box.checked = true;
+  box.dispatchEvent(new Event('change'));
+  assert.equal(menu.getRules().faecher, true);
+  assert.equal(loadRules(storage).faecher, true);
+});
+
+test('rules menu toggles custom rule Opposite double bull and persists it', () => {
+  const storage = createMemoryStorage();
+  const menu = createRulesMenu({ storage });
+  const box = menu.element.querySelectorAll('.custom-rules input[type="checkbox"]')[1];
+  box.checked = true;
+  box.dispatchEvent(new Event('change'));
+  assert.equal(menu.getRules().oppositeBull, true);
+  assert.equal(loadRules(storage).oppositeBull, true);
 });
 
 test('loadRules falls back to defaults on corrupt or invalid data', () => {
-  assert.deepEqual(loadRules(createMemoryStorage({ [RULES_KEY]: '{nope' })), { startScore: 501, outMode: 'double' });
-  assert.deepEqual(loadRules(createMemoryStorage({ [RULES_KEY]: '{"startScore":7}' })), { startScore: 501, outMode: 'double' });
+  assert.deepEqual(loadRules(createMemoryStorage({ [RULES_KEY]: '{nope' })), { startScore: 501, outMode: 'double', faecher: false, oppositeBull: false });
+  assert.deepEqual(loadRules(createMemoryStorage({ [RULES_KEY]: '{"startScore":7}' })), { startScore: 501, outMode: 'double', faecher: false, oppositeBull: false });
 });
 
 test('scoreboard shows scores, current player and thrown darts', () => {

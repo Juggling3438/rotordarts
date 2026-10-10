@@ -9,6 +9,19 @@ export const RULES_KEY = 'rotordarts.rules';
 
 const OUT_LABELS = { [OUT_MODES.DOUBLE]: 'Double out', [OUT_MODES.STRAIGHT]: 'Straight out' };
 
+const CUSTOM_RULES = [
+  {
+    key: 'faecher',
+    label: 'Fächer',
+    hint: 'If the board offset between the 3 darts is equal, all darts count the highest field (e.g. 20, 1, 18 → 20, 20, 20).',
+  },
+  {
+    key: 'oppositeBull',
+    label: 'Opposite double bull',
+    hint: 'Instant win: first two darts are doubles on opposite fields, third dart is the bull (e.g. D1 + D19 + BULL).',
+  },
+];
+
 export function loadRules(storage) {
   try {
     return createRules(JSON.parse(storage.getItem(RULES_KEY)) ?? {});
@@ -59,9 +72,29 @@ export function createRulesMenu({ storage = getDefaultStorage(), onChange = () =
       (v) => update({ outMode: v })),
   );
 
+  const custom = document.createElement('fieldset');
+  custom.className = 'custom-rules';
+  const customLegend = document.createElement('legend');
+  customLegend.textContent = 'Custom rules';
+  custom.append(customLegend);
+  for (const { key, label, hint } of CUSTOM_RULES) {
+    const wrap = document.createElement('label');
+    wrap.title = hint;
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.checked = rules[key];
+    box.addEventListener('change', () => update({ [key]: box.checked }));
+    const text = document.createElement('span');
+    text.textContent = label;
+    wrap.append(box, text);
+    custom.append(wrap);
+  }
+  element.append(custom);
+
   return { element, getRules: () => rules, destroy: () => element.remove() };
 }
 
 export function describeRules(rules) {
-  return `${rules.startScore} · ${OUT_LABELS[rules.outMode]}`;
+  const extras = CUSTOM_RULES.filter((r) => rules[r.key]).map((r) => ` · ${r.label}`).join('');
+  return `${rules.startScore} · ${OUT_LABELS[rules.outMode]}${extras}`;
 }
