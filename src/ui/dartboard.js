@@ -18,8 +18,9 @@ export const RADII = Object.freeze({
   tripleOuter: 107,
   doubleInner: 150,
   doubleOuter: 170,
-  numbers: 190,
-  surround: 210,
+  // Numbers sit inside the (larger) outer single ring so the board can fill the screen on phones.
+  numbers: (107 + 150) / 2,
+  surround: 178,
 });
 
 const RINGS = Object.freeze([
