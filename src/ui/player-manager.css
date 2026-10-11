@@ -12,6 +12,7 @@
 .player-manager button {
   font: inherit; padding: .4rem .75rem; color: inherit; cursor: pointer;
   background: #2e333b; border: 1px solid var(--pm-line);
+  touch-action: manipulation; /* no double-tap zoom on mobile */
 }
 .player-manager button:hover:not(:disabled) { background: var(--pm-ok); }
 .player-manager button:disabled { opacity: .35; cursor: default; }

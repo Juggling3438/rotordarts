@@ -22,6 +22,7 @@ main {
 button {
   font: inherit; padding: .6rem 1.1rem; color: inherit; cursor: pointer;
   background: var(--panel); border: 1px solid var(--line);
+  touch-action: manipulation; /* no double-tap zoom on mobile */
 }
 button:hover:not(:disabled) { background: var(--ok); }
 button:disabled { opacity: .4; cursor: default; }
@@ -32,7 +33,7 @@ button.primary:hover:not(:disabled) { background: #e8706c; }
 .rules-menu h2 { flex-basis: 100%; margin: 0; font-size: 1.1rem; }
 .rules-menu fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .rules-menu legend { float: left; margin-right: .5rem; color: #aab; padding: 0; }
-.rules-menu label { cursor: pointer; }
+.rules-menu label { cursor: pointer; touch-action: manipulation; }
 .rules-menu input { position: absolute; opacity: 0; }
 .rules-menu label span { display: inline-block; padding: .4rem .8rem; background: var(--bg); border: 1px solid var(--line); }
 .rules-menu input:checked + span { background: var(--ok); }
