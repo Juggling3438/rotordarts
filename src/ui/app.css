@@ -14,20 +14,20 @@ main { max-width: 1000px; margin: 0 auto; padding: 1rem; }
 
 button {
   font: inherit; padding: .6rem 1.1rem; color: inherit; cursor: pointer;
-  background: var(--panel); border: 1px solid var(--line); border-radius: .5rem;
+  background: var(--panel); border: 1px solid var(--line);
 }
 button:hover:not(:disabled) { background: var(--ok); }
 button:disabled { opacity: .4; cursor: default; }
 button.primary { background: var(--accent); }
 button.primary:hover:not(:disabled) { background: #e8706c; }
 
-.rules-menu { background: var(--panel); border-radius: .75rem; padding: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.rules-menu { background: var(--panel); padding: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
 .rules-menu h2 { flex-basis: 100%; margin: 0; font-size: 1.1rem; }
 .rules-menu fieldset { border: 0; margin: 0; padding: 0; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .rules-menu legend { float: left; margin-right: .5rem; color: #aab; padding: 0; }
 .rules-menu label { cursor: pointer; }
 .rules-menu input { position: absolute; opacity: 0; }
-.rules-menu label span { display: inline-block; padding: .4rem .8rem; background: var(--bg); border: 1px solid var(--line); border-radius: .5rem; }
+.rules-menu label span { display: inline-block; padding: .4rem .8rem; background: var(--bg); border: 1px solid var(--line); }
 .rules-menu input:checked + span { background: var(--ok); }
 .rules-menu input:focus-visible + span { outline: 2px solid #ffd54f; }
 
@@ -39,7 +39,7 @@ button.primary:hover:not(:disabled) { background: #e8706c; }
 .scoreboard { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .sb-player {
   display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name score" "darts score" "avg score";
-  gap: .1rem 1rem; padding: .75rem 1rem; background: var(--panel); border-left: .4rem solid transparent; border-radius: .5rem;
+  gap: .1rem 1rem; padding: .75rem 1rem; background: var(--panel); border-left: .4rem solid transparent;
 }
 .sb-player.is-current { border-left-color: var(--accent); background: #444b57; }
 .sb-player.is-winner { border-left-color: #ffd54f; }

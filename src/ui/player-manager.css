@@ -1,24 +1,24 @@
 .player-manager {
   --pm-bg: #383e48; --pm-line: #1b1e23; --pm-accent: #dc5753; --pm-ok: #528f6f;
-  background: var(--pm-bg); color: #eee; border-radius: .75rem; padding: 1rem;
+  background: var(--pm-bg); color: #eee; padding: 1rem;
   font-family: system-ui, sans-serif;
 }
 .player-manager h2 { margin: 0 0 .75rem; font-size: 1.1rem; }
 .pm-add { display: flex; gap: .5rem; }
 .pm-add input, .pm-rename {
   flex: 1; min-width: 0; font: inherit; padding: .5rem .75rem; color: inherit;
-  background: #2e333b; border: 1px solid var(--pm-line); border-radius: .5rem;
+  background: #2e333b; border: 1px solid var(--pm-line);
 }
 .player-manager button {
   font: inherit; padding: .4rem .75rem; color: inherit; cursor: pointer;
-  background: #2e333b; border: 1px solid var(--pm-line); border-radius: .5rem;
+  background: #2e333b; border: 1px solid var(--pm-line);
 }
 .player-manager button:hover:not(:disabled) { background: var(--pm-ok); }
 .player-manager button:disabled { opacity: .35; cursor: default; }
 .pm-error { color: #ff9a96; min-height: 1.2em; margin: .4rem 0; font-size: .9rem; }
 .pm-empty { color: #aab; margin: 0; }
 .pm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
-.pm-player { display: flex; align-items: center; gap: .6rem; padding: .35rem .5rem; background: #2e333b; border-radius: .5rem; }
+.pm-player { display: flex; align-items: center; gap: .6rem; padding: .35rem .5rem; background: #2e333b; }
 .pm-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pm-actions { display: flex; gap: .25rem; }
 .pm-actions button { padding: .2rem .5rem; }
