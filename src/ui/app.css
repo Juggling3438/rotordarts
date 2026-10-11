@@ -3,11 +3,18 @@
 body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
 [hidden] { display: none !important; }
 
-header { display: flex; align-items: baseline; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line); }
+header {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: calc(.75rem + env(safe-area-inset-top)) calc(1rem + env(safe-area-inset-right)) .75rem calc(1rem + env(safe-area-inset-left));
+  border-bottom: 1px solid var(--line);
+}
 header h1 { margin: 0; font-size: 1.25rem; }
 #rules-label { color: #aab; margin-left: auto; }
 
-main { max-width: 1000px; margin: 0 auto; padding: 1rem; }
+main {
+  max-width: 1000px; margin: 0 auto;
+  padding: 1rem calc(1rem + env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) calc(1rem + env(safe-area-inset-left));
+}
 #setup { display: grid; gap: 1rem; max-width: 520px; }
 #game { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1.2fr) minmax(260px, 1fr); align-items: start; }
 @media (max-width: 760px) { #game { grid-template-columns: 1fr; } }
