@@ -58,6 +58,16 @@ test('isFaecher detects equal board offset', () => {
   assert.ok(!isFaecher([dart(20), dart(25), dart(18)]));
   assert.ok(!isFaecher([dart(20), dart(1)]));
 });
+test('isFaecher is order independent', () => {
+  // 20, 1, 18 are equally spaced; any throwing order is still a Fächer.
+  assert.ok(isFaecher([dart(18), dart(20), dart(1)]));
+  assert.ok(isFaecher([dart(1), dart(18), dart(20)]));
+  assert.ok(isFaecher([dart(18), dart(1), dart(20)]));
+  assert.ok(isFaecher([dart(1), dart(20), dart(18)]));
+  // Unequally spaced segments stay a non-Fächer in every order.
+  assert.ok(!isFaecher([dart(4), dart(20), dart(1)]));
+  assert.ok(!isFaecher([dart(1), dart(4), dart(20)]));
+});
 test('Fächer: 20+1+18 scores 60', () => {
   const rules = createRules({ faecher: true });
   const s = throwAll(createGame(rules, players), [dart(20), dart(1), dart(18)]);

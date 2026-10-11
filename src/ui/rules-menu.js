@@ -17,7 +17,7 @@ const CUSTOM_RULES = [
   },
   {
     key: 'oppositeBull',
-    label: 'Opposite double bull',
+    label: 'Instant win',
     hint: 'Instant win: first two darts are doubles on opposite fields, third dart is the bull (e.g. D1 + D19 + BULL).',
   },
 ];

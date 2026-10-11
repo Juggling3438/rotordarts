@@ -30,15 +30,21 @@ export function createRules({
 export const BOARD_RING = Object.freeze([20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5]);
 
 /**
- * Custom rule "Fächer": three numbered darts (no bull / miss) whose board offset
- * between consecutive darts is identical. Then every dart counts the highest segment.
+ * Custom rule "Fächer": three numbered darts (no bull / miss) that are equally
+ * spaced around the board, regardless of the order they were thrown. This is the
+ * case when one of the darts sits exactly halfway between the other two.
  */
 export function isFaecher(darts) {
   if (darts.length !== DARTS_PER_TURN) return false;
   if (darts.some((d) => d.segment === MISS || d.segment === BULL)) return false;
   const [a, b, c] = darts.map((d) => BOARD_RING.indexOf(d.segment));
   const n = BOARD_RING.length;
-  return (b - a + n) % n === (c - b + n) % n;
+  const step = (from, to) => (to - from + n) % n;
+  return (
+    step(a, b) === step(b, c) || // b is the middle dart
+    step(b, a) === step(a, c) || // a is the middle dart
+    step(a, c) === step(c, b)    // c is the middle dart
+  );
 }
 
 /**
