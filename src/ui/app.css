@@ -58,4 +58,4 @@ button.primary:hover:not(:disabled) { background: #e8706c; }
 .sb-darts.is-finished { color: #8d96a6; }
 .sb-darts.is-bust { color: #ff9a96; }
 .sb-avg { grid-area: avg; font-size: .85rem; color: #aab; }
-.sb-score { grid-area: score; align-self: center; font-size: 1.75rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sb-score { grid-area: score; align-self: center; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
