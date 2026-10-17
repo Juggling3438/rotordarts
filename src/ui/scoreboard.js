@@ -1,5 +1,5 @@
 /** Active players with their score, current darts and average. Pure view: render(state). */
-import { dartLabel, getCurrentPlayer, threeDartAverage, DARTS_PER_TURN } from '../engine/darts-engine.js';
+import { dartLabel, getCurrentPlayer, threeDartAverage, turnValues, DARTS_PER_TURN } from '../engine/darts-engine.js';
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -21,8 +21,21 @@ export function createScoreboard() {
         li.classList.toggle('is-current', isCurrent && !state.winnerId);
         li.classList.toggle('is-winner', p.id === state.winnerId);
 
-        const name = el('span', 'sb-name', p.name);
-        const avg = el('span', 'sb-avg', `avg ${threeDartAverage(state, p.id).toFixed(1)}`);
+        const isWinner = p.id === state.winnerId;
+        const name = el('span', 'sb-name', isWinner ? `👑 ${p.name}` : p.name);
+
+        // During play show the current turn's score; once there's a winner, show the average.
+        let avgText;
+        if (state.winnerId) {
+          avgText = `∅ ${threeDartAverage(state, p.id).toFixed(1)}`;
+        } else if (isCurrent) {
+          const thrown = turnValues(state.turn.darts, state.rules).reduce((s, v) => s + v, 0);
+          avgText = String(thrown);
+        } else {
+          const lastTurn = state.turns.findLast((t) => t.playerId === p.id);
+          avgText = String(lastTurn ? lastTurn.values.reduce((s, v) => s + v, 0) : 0);
+        }
+        const avg = el('span', 'sb-avg', avgText);
         const score = el('span', 'sb-score', String(p.score));
 
         // A player's darts stay visible until that same player throws their next dart:

@@ -144,7 +144,7 @@ function buildSvg(doc) {
   // Corner buttons: miss (lower-left) and undo (lower-right).
   const buttons = el(doc, 'g', { class: 'board-buttons' });
   buttons.append(
-    buildButton(doc, 'miss', '∅', -145, 145),
+    buildButton(doc, 'miss', '🗙', -145, 145),
     buildButton(doc, 'undo', '⤺', 145, 145),
   );
   svg.append(buttons);

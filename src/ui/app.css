@@ -42,8 +42,6 @@ button.primary:hover:not(:disabled) { background: #e8706c; }
 .rules-menu input:focus-visible + span { outline: 2px solid #ffd54f; }
 
 .game-board { display: grid; gap: .75rem; }
-#status { margin: 0; font-size: 1.15rem; text-align: center; min-height: 1.5em; }
-#status.is-win { color: #ffd54f; font-weight: 700; }
 .controls { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
 
 .scoreboard { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }

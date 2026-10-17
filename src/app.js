@@ -1,4 +1,4 @@
-import { createGame, throwDart, undoDart, getCurrentPlayer, dart, DARTS_PER_TURN } from './engine/darts-engine.js';
+import { createGame, throwDart, undoDart, dart } from './engine/darts-engine.js';
 import { createGameStore } from './storage/players.js';
 import { createDartboard } from './ui/dartboard.js';
 import { createPlayerManager } from './ui/player-manager.js';
@@ -34,21 +34,9 @@ function show(screen) {
   $('game').hidden = screen !== 'game';
 }
 
-function status() {
-  if (state.winnerId) {
-    const winner = state.players.find((p) => p.id === state.winnerId);
-    return `🎯 ${winner.name} wins!`;
-  }
-  const last = state.turns.at(-1);
-  const bust = last?.bust && state.turn.darts.length === 0 ? 'Bust! ' : '';
-  return `${bust}${getCurrentPlayer(state).name} – dart ${state.turn.darts.length + 1} of ${DARTS_PER_TURN}`;
-}
-
 function render() {
   scoreboard.render(state);
   $('rules-label').textContent = describeRules(state.rules);
-  $('status').textContent = status();
-  $('status').classList.toggle('is-win', Boolean(state.winnerId));
   board.setDisabled(Boolean(state.winnerId));
   $('rematch').hidden = !state.winnerId;
 }
