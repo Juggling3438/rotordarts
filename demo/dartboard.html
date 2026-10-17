@@ -24,7 +24,6 @@
   <main>
     <div id="board"></div>
     <div class="controls">
-      <button id="miss">Miss</button>
       <button id="clear">Clear</button>
       <label><input type="checkbox" id="disable"> Disabled</label>
       <span id="turn">–</span>
@@ -53,10 +52,13 @@
       render();
     };
 
-    const board = createDartboard({ onThrow: record });
+    const board = createDartboard({
+      onThrow: record,
+      onMiss: () => record(dart(0)),
+      onUndo: () => { darts.pop(); board.clearMarkers(); render(); },
+    });
     document.getElementById('board').append(board.element);
 
-    document.getElementById('miss').onclick = () => record(dart(0));
     document.getElementById('clear').onclick = () => { darts = []; board.clearMarkers(); render(); };
     document.getElementById('disable').onchange = (e) => board.setDisabled(e.target.checked);
   </script>

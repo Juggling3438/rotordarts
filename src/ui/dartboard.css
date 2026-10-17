@@ -70,6 +70,34 @@
   pointer-events: none;
 }
 
+.dartboard .board-button {
+  cursor: pointer;
+  outline: none;
+}
+.dartboard .board-button-bg {
+  fill: var(--db-bg);
+  stroke: var(--db-wire);
+  stroke-width: 1.5;
+  transition: fill 80ms ease;
+}
+.dartboard .board-button-label {
+  fill: #eee;
+  font: 600 15px system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.dartboard .board-button--miss .board-button-bg { fill: var(--panel); }
+.dartboard .board-button--undo .board-button-bg { fill: var(--panel); }
+@media (hover: hover) {
+  .dartboard .board-button:hover .board-button-bg { fill: var(--db-hit); }
+  .dartboard .board-button:hover .board-button-label { fill: #1b1e23; }
+}
+.dartboard .board-button:focus-visible .board-button-bg {
+  stroke: var(--db-hit);
+  stroke-width: 3;
+}
+
 .dartboard.is-disabled {
   cursor: not-allowed;
   opacity: 0.55;

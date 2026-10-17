@@ -10,7 +10,11 @@ const gameStore = createGameStore();
 const scoreboard = createScoreboard();
 $('scoreboard').append(scoreboard.element);
 
-const board = createDartboard({ onThrow: (d, point) => handleThrow(d, point) });
+const board = createDartboard({
+  onThrow: (d, point) => handleThrow(d, point),
+  onMiss: () => handleThrow(dart(0)),
+  onUndo: () => undo(),
+});
 $('board').append(board.element);
 
 // --- setup screen ---
@@ -46,8 +50,6 @@ function render() {
   $('status').textContent = status();
   $('status').classList.toggle('is-win', Boolean(state.winnerId));
   board.setDisabled(Boolean(state.winnerId));
-  $('miss').disabled = Boolean(state.winnerId);
-  $('undo').disabled = state.throws.length === 0;
   $('rematch').hidden = !state.winnerId;
 }
 
@@ -74,14 +76,13 @@ function startGame(rules, selected) {
 }
 
 startButton.addEventListener('click', () => startGame(rulesMenu.getRules(), players.getSelected()));
-$('miss').addEventListener('click', () => handleThrow(dart(0)));
-$('undo').addEventListener('click', () => {
+function undo() {
   state = undoDart(state);
   clearOnNext = false;
   board.clearMarkers();
   gameStore.save(state);
   render();
-});
+}
 $('rematch').addEventListener('click', () => startGame(state.rules, state.players));
 $('new-game').addEventListener('click', () => {
   if (!state.winnerId && state.throws.length > 0 && !confirm('Abandon the running game?')) return;

@@ -83,6 +83,20 @@ function titled(doc, d) {
   return el(doc, 'title', {}, [`${dartLabel(d)} (${d.value})`]);
 }
 
+/** Overlay button (miss / undo) drawn inside the board at the given board coordinates. */
+function buildButton(doc, name, label, x, y) {
+  return el(doc, 'g', {
+    class: `board-button board-button--${name}`,
+    role: 'button',
+    tabindex: '0',
+    'aria-label': label,
+    transform: `translate(${x} ${y})`,
+  }, [
+    el(doc, 'circle', { class: 'board-button-bg', r: 20 }),
+    el(doc, 'text', { class: 'board-button-label', x: 0, y: 0 }, [label]),
+  ]);
+}
+
 function buildSvg(doc) {
   const { surround } = RADII;
   const svg = el(doc, 'svg', {
@@ -127,17 +141,27 @@ function buildSvg(doc) {
   const markers = el(doc, 'g', { class: 'markers', 'aria-hidden': 'true' });
   svg.append(markers);
 
-  return { svg, markers };
+  // Corner buttons: miss (lower-left) and undo (lower-right).
+  const buttons = el(doc, 'g', { class: 'board-buttons' });
+  buttons.append(
+    buildButton(doc, 'miss', '∅', -145, 145),
+    buildButton(doc, 'undo', '⤺', 145, 145),
+  );
+  svg.append(buttons);
+
+  return { svg, markers, buttons };
 }
 
 /**
  * Create a dartboard element.
  * @param {object} options
  * @param {(dart: object, point: {x:number,y:number}) => void} options.onThrow called for every click
+ * @param {() => void} [options.onMiss] called when the miss button is pressed
+ * @param {() => void} [options.onUndo] called when the undo button is pressed
  * @param {Document} [options.document]
  * @returns {{ element: SVGSVGElement, setDisabled(b:boolean):void, addMarker(p):void, clearMarkers():void, destroy():void }}
  */
-export function createDartboard({ onThrow, document: doc = globalThis.document } = {}) {
+export function createDartboard({ onThrow, onMiss, onUndo, document: doc = globalThis.document } = {}) {
   const { svg, markers } = buildSvg(doc);
   let disabled = false;
 
@@ -167,12 +191,28 @@ export function createDartboard({ onThrow, document: doc = globalThis.document }
 
   function handleClick(event) {
     if (disabled) return;
+    const button = event.target?.closest?.('.board-button');
+    if (button) {
+      if (button.classList.contains('board-button--miss')) onMiss?.();
+      else if (button.classList.contains('board-button--undo')) onUndo?.();
+      return;
+    }
     const point = toBoardPoint(event.clientX, event.clientY);
     if (!point) return;
     const d = hitTest(point.x, point.y);
     flash(event.target);
     addMarker(point);
     onThrow?.(d, point);
+  }
+
+  function handleKeydown(event) {
+    if (disabled) return;
+    const button = event.target?.closest?.('.board-button');
+    if (!button) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    if (button.classList.contains('board-button--miss')) onMiss?.();
+    else if (button.classList.contains('board-button--undo')) onUndo?.();
   }
 
   function setDisabled(value) {
@@ -182,6 +222,7 @@ export function createDartboard({ onThrow, document: doc = globalThis.document }
   }
 
   svg.addEventListener('click', handleClick);
+  svg.addEventListener('keydown', handleKeydown);
 
   return {
     element: svg,
@@ -190,6 +231,7 @@ export function createDartboard({ onThrow, document: doc = globalThis.document }
     clearMarkers,
     destroy() {
       svg.removeEventListener('click', handleClick);
+      svg.removeEventListener('keydown', handleKeydown);
       svg.remove();
     },
   };
