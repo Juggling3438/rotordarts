@@ -49,7 +49,7 @@ button.primary:hover:not(:disabled) { background: #e8706c; }
 .scoreboard { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .sb-player {
   display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name score" "darts score" "avg score";
-  gap: .1rem 1rem; padding: .75rem .75rem; background: var(--panel); border-left: .4rem solid transparent;
+  gap: .1rem 1rem; padding: .75rem .5rem; background: var(--panel); border-left: .4rem solid transparent;
 }
 .sb-player.is-current { border-left-color: var(--accent); background: #444b57; }
 .sb-player.is-winner { border-left-color: #ffd54f; }
