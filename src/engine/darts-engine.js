@@ -88,8 +88,8 @@ export function dart(segment, multiplier = 1) {
 
 /** Human readable label, e.g. "T20", "D16", "BULL", "25", "MISS". */
 export function dartLabel(d) {
-  if (d.segment === MISS) return 'MISS';
-  if (d.segment === BULL) return d.multiplier === 2 ? 'BULL' : '25';
+  if (d.segment === MISS) return 'x';
+  if (d.segment === BULL) return d.multiplier === 2 ? '50' : '25';
   return `${['', 'S', 'D', 'T'][d.multiplier]}${d.segment}`;
 }
 
