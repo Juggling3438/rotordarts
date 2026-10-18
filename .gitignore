@@ -1,0 +1,5 @@
+# Kiro CLI agent configuration
+.kiro/
+
+# macOS metadata
+.DS_Store
