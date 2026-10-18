@@ -188,7 +188,7 @@ export function undoDart(state) {
  * @returns {{ segment: number, multiplier: number } | null}
  */
 export function checkoutHint(score, outMode, dartsLeft) {
-  if (score <= 1 || score > 170) return null;
+  if (score <= 1) return null;
   if (dartsLeft < 1 || dartsLeft > 3) return null;
 
   if (outMode === OUT_MODES.STRAIGHT) {
@@ -199,6 +199,9 @@ export function checkoutHint(score, outMode, dartsLeft) {
     if (score <= 60 && score % 3 === 0) return { segment: score / 3, multiplier: 3 };
     return null;
   }
+
+  // Double out: no route exists above 170.
+  if (score > 170) return null;
 
   // Double out: pick the best route. Prefer a route that fits exactly within
   // dartsLeft; if none fits, fall back to the shortest route and show the dart

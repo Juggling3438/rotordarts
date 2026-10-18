@@ -226,9 +226,9 @@ export function createDartboard({ onThrow, onMiss, onUndo, document: doc = globa
     clearHint();
     if (segment == null) return;
     const els = svg.querySelectorAll(`[data-segment="${segment}"][data-multiplier="${multiplier}"]`);
-    // For singles there are two rings (inner and outer); prefer the outer (last in DOM) as it is larger.
-    const target = els[els.length - 1];
-    if (target) target.classList.add('hint');
+    // For singles there are two rings (inner and outer); highlight both.
+    // For doubles/triples there is only one element.
+    els.forEach((el) => el.classList.add('hint'));
   }
 
   function clearHint() {

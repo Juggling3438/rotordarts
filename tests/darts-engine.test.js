@@ -279,5 +279,9 @@ test('checkoutHint: straight out hints', () => {
   assert.deepEqual(checkoutHint(60, OUT_MODES.STRAIGHT, 1), { segment: 20, multiplier: 3 });
   assert.deepEqual(checkoutHint(50, OUT_MODES.STRAIGHT, 1), { segment: 25, multiplier: 2 });
   assert.deepEqual(checkoutHint(25, OUT_MODES.STRAIGHT, 1), { segment: 25, multiplier: 1 });
+  // scores above 60 (and not bull) have no 1-dart finish → null
   assert.equal(checkoutHint(171, OUT_MODES.STRAIGHT, 3), null);
+  assert.equal(checkoutHint(501, OUT_MODES.STRAIGHT, 3), null);
+  // scores > 170 are NOT blocked for straight out (unlike double out)
+  assert.equal(checkoutHint(200, OUT_MODES.STRAIGHT, 3), null); // no single dart covers 200
 });

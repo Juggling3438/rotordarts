@@ -107,9 +107,26 @@
   animation: db-hint-pulse 1.2s ease-in-out infinite;
 }
 
+/* Each segment type pulses between its normal colour and a lighter variant. */
+.dartboard .single.dark.hint,
+.dartboard .single.light.hint,
+.dartboard :is(.triple, .double).dark.hint,
+.dartboard :is(.triple, .double).light.hint,
+.dartboard .single-bull.hint,
+.dartboard .double-bull.hint {
+  animation: db-hint-pulse 1.2s ease-in-out infinite;
+}
+
+.dartboard .single.dark.hint         { --db-hint-from: var(--db-dark);  --db-hint-to: #7a8494; }
+.dartboard .single.light.hint        { --db-hint-from: var(--db-light); --db-hint-to: #c4824a; }
+.dartboard :is(.triple,.double).dark.hint  { --db-hint-from: var(--db-red);   --db-hint-to: #f5a8a5; }
+.dartboard :is(.triple,.double).light.hint { --db-hint-from: var(--db-green); --db-hint-to: #96d4b0; }
+.dartboard .single-bull.hint         { --db-hint-from: var(--db-green); --db-hint-to: #96d4b0; }
+.dartboard .double-bull.hint         { --db-hint-from: var(--db-red);   --db-hint-to: #f5a8a5; }
+
 @keyframes db-hint-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
+  0%, 100% { fill: var(--db-hint-from); }
+  50%       { fill: var(--db-hint-to); }
 }
 
 @media (prefers-reduced-motion: reduce) {
