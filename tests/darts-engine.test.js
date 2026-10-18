@@ -240,14 +240,34 @@ test('checkoutHint: 2-dart – shows first dart when dartsLeft=2', () => {
   assert.deepEqual(checkoutHint(41, OUT_MODES.DOUBLE, 2), { segment: 1, multiplier: 1 });
 });
 test('checkoutHint: 2-dart – shows finish dart when dartsLeft=1', () => {
-  // 41 = S1 + D20: with only 1 dart left, still show D20 (best available finish)
-  assert.deepEqual(checkoutHint(41, OUT_MODES.DOUBLE, 1), { segment: 20, multiplier: 2 });
+  // 41 = S1 + D20: with only 1 dart left the checkout is impossible → null
+  assert.equal(checkoutHint(41, OUT_MODES.DOUBLE, 1), null);
 });
-test('checkoutHint: 3-dart – steps through route', () => {
-  // 170 = T20 + T20 + B2
+test('checkoutHint: double-out 41 with dartsLeft=1 must not suggest D20 (would leave 1)', () => {
+  // Regression: D20=40, leaving 1 point which is an impossible double-out finish.
+  // The hint must return null, not suggest D20.
+  assert.equal(checkoutHint(41, OUT_MODES.DOUBLE, 1), null);
+});
+test('checkoutHint: 3-dart route returns null if fewer than needed darts remain', () => {
+  // 106 = T20 + T2 + D20: impossible to finish with 1 or 2 darts left
+  assert.equal(checkoutHint(106, OUT_MODES.DOUBLE, 1), null);
+  assert.equal(checkoutHint(106, OUT_MODES.DOUBLE, 2), null);
+  assert.deepEqual(checkoutHint(106, OUT_MODES.DOUBLE, 3), { segment: 20, multiplier: 3 });
+  // 99 = T20 + S1 + D19: same rule
+  assert.equal(checkoutHint(99, OUT_MODES.DOUBLE, 1), null);
+  assert.equal(checkoutHint(99, OUT_MODES.DOUBLE, 2), null);
+  assert.deepEqual(checkoutHint(99, OUT_MODES.DOUBLE, 3), { segment: 20, multiplier: 3 });
+});
+test('checkoutHint: 3-dart – shows correct dart at each step', () => {
+  // 170 = T20 + T20 + B2: only possible with exactly 3 darts left
   assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 3), { segment: 20, multiplier: 3 });
-  assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 2), { segment: 20, multiplier: 3 });
-  assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 1), { segment: 25, multiplier: 2 });
+  assert.equal(checkoutHint(170, OUT_MODES.DOUBLE, 2), null);
+  assert.equal(checkoutHint(170, OUT_MODES.DOUBLE, 1), null);
+  // after T20 the score is 110 – a 2-dart finish
+  assert.deepEqual(checkoutHint(110, OUT_MODES.DOUBLE, 2), { segment: 20, multiplier: 3 });
+  assert.equal(checkoutHint(110, OUT_MODES.DOUBLE, 1), null);
+  // after T20+T20 the score is 50 – a 1-dart finish
+  assert.deepEqual(checkoutHint(50, OUT_MODES.DOUBLE, 1), { segment: 25, multiplier: 2 });
 });
 test('checkoutHint: no route for impossible scores', () => {
   assert.equal(checkoutHint(159, OUT_MODES.DOUBLE, 3), null);

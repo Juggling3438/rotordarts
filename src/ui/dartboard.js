@@ -225,8 +225,10 @@ export function createDartboard({ onThrow, onMiss, onUndo, document: doc = globa
   function setHint(segment, multiplier) {
     clearHint();
     if (segment == null) return;
-    const el = svg.querySelector(`[data-segment="${segment}"][data-multiplier="${multiplier}"]`);
-    if (el) el.classList.add('hint');
+    const els = svg.querySelectorAll(`[data-segment="${segment}"][data-multiplier="${multiplier}"]`);
+    // For singles there are two rings (inner and outer); prefer the outer (last in DOM) as it is larger.
+    const target = els[els.length - 1];
+    if (target) target.classList.add('hint');
   }
 
   function clearHint() {

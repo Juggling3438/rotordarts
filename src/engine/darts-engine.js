@@ -208,10 +208,11 @@ export function checkoutHint(score, outMode, dartsLeft) {
 
   // Best route: fewest darts, preference already encoded in table order.
   const best = routes[0];
+  // If fewer darts remain than the route requires, no checkout is possible this turn.
+  if (dartsLeft < best.length) return null;
   const idx = best.length - dartsLeft;
-  // idx < 0 means the route needs fewer darts than we have left → show first dart.
-  // idx >= best.length means we're past the end (shouldn't happen) → show last dart.
-  return best[Math.max(0, Math.min(idx, best.length - 1))];
+  // idx < 0 means more darts remain than the route needs → show the first dart.
+  return best[Math.max(0, idx)];
 }
 
 /**
