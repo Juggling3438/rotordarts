@@ -103,7 +103,17 @@
   opacity: 0.55;
 }
 
+.dartboard .segment.hint {
+  animation: db-hint-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes db-hint-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dartboard .segment { transition: none; }
   .dartboard .segment.hit { animation: none; }
+  .dartboard .segment.hint { animation: none; }
 }

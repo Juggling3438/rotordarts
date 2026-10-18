@@ -6,6 +6,7 @@ import { createRules, START_SCORES, OUT_MODES } from '../engine/darts-engine.js'
 import { getDefaultStorage } from '../storage/players.js';
 
 export const RULES_KEY = 'rotordarts.rules';
+export const HINTS_KEY = 'rotordarts.hints';
 
 const OUT_LABELS = { [OUT_MODES.DOUBLE]: 'Double out', [OUT_MODES.STRAIGHT]: 'Straight out' };
 
@@ -53,13 +54,14 @@ function group(name, legend, options, current, onPick) {
 
 export function createRulesMenu({ storage = getDefaultStorage(), onChange = () => {} } = {}) {
   let rules = loadRules(storage);
+  let hintsEnabled = storage.getItem(HINTS_KEY) !== 'false';
   const element = document.createElement('section');
   element.className = 'rules-menu';
 
   function update(patch) {
     rules = createRules({ ...rules, ...patch });
     storage.setItem(RULES_KEY, JSON.stringify(rules));
-    onChange(rules);
+    onChange(rules, hintsEnabled);
   }
 
   const title = document.createElement('h2');
@@ -89,9 +91,31 @@ export function createRulesMenu({ storage = getDefaultStorage(), onChange = () =
     wrap.append(box, text);
     custom.append(wrap);
   }
+
+  // Hints toggle – not a game rule, stored separately
+  const hintsWrap = document.createElement('label');
+  hintsWrap.title = 'Highlight the recommended next dart on the board for scores ≤ 170.';
+  const hintsBox = document.createElement('input');
+  hintsBox.type = 'checkbox';
+  hintsBox.checked = hintsEnabled;
+  hintsBox.addEventListener('change', () => {
+    hintsEnabled = hintsBox.checked;
+    storage.setItem(HINTS_KEY, String(hintsEnabled));
+    onChange(rules, hintsEnabled);
+  });
+  const hintsText = document.createElement('span');
+  hintsText.textContent = 'Checkout hints';
+  hintsWrap.append(hintsBox, hintsText);
+  custom.append(hintsWrap);
+
   element.append(custom);
 
-  return { element, getRules: () => rules, destroy: () => element.remove() };
+  return {
+    element,
+    getRules: () => rules,
+    getHintsEnabled: () => hintsEnabled,
+    destroy: () => element.remove(),
+  };
 }
 
 export function describeRules(rules) {

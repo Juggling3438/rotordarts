@@ -221,12 +221,26 @@ export function createDartboard({ onThrow, onMiss, onUndo, document: doc = globa
     svg.setAttribute('aria-disabled', String(disabled));
   }
 
+  /** Highlight a single segment as the recommended next dart. */
+  function setHint(segment, multiplier) {
+    clearHint();
+    if (segment == null) return;
+    const el = svg.querySelector(`[data-segment="${segment}"][data-multiplier="${multiplier}"]`);
+    if (el) el.classList.add('hint');
+  }
+
+  function clearHint() {
+    svg.querySelectorAll('.hint').forEach((el) => el.classList.remove('hint'));
+  }
+
   svg.addEventListener('click', handleClick);
   svg.addEventListener('keydown', handleKeydown);
 
   return {
     element: svg,
     setDisabled,
+    setHint,
+    clearHint,
     addMarker,
     clearMarkers,
     destroy() {

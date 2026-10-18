@@ -2,6 +2,7 @@ import { test, assert } from './harness.js';
 import {
   createRules, createGame, dart, dartLabel, throwDart, undoDart, isBust,
   getCurrentPlayer, threeDartAverage, OUT_MODES, isFaecher, turnValues, isOppositeDoubleBull,
+  checkoutHint,
 } from '../src/engine/darts-engine.js';
 
 const players = [{ id: 'a', name: 'Alice' }, { id: 'b', name: 'Bob' }];
@@ -220,4 +221,43 @@ test('three dart average', () => {
   g = throwAll(g, [dart(20, 3), dart(20, 3), dart(20, 3)]);
   assert.equal(threeDartAverage(g, 'a'), 180);
   assert.equal(threeDartAverage(g, 'b'), 0);
+});
+
+// --- checkout hints ---
+test('checkoutHint: returns null outside hint range', () => {
+  assert.equal(checkoutHint(1,   OUT_MODES.DOUBLE, 3), null);
+  assert.equal(checkoutHint(171, OUT_MODES.DOUBLE, 3), null);
+  assert.equal(checkoutHint(0,   OUT_MODES.DOUBLE, 3), null);
+});
+test('checkoutHint: 1-dart double-out finishes', () => {
+  assert.deepEqual(checkoutHint(40, OUT_MODES.DOUBLE, 1), { segment: 20, multiplier: 2 });
+  assert.deepEqual(checkoutHint(16, OUT_MODES.DOUBLE, 1), { segment: 8,  multiplier: 2 });
+  assert.deepEqual(checkoutHint(50, OUT_MODES.DOUBLE, 1), { segment: 25, multiplier: 2 });
+  assert.deepEqual(checkoutHint(2,  OUT_MODES.DOUBLE, 1), { segment: 1,  multiplier: 2 });
+});
+test('checkoutHint: 2-dart – shows first dart when dartsLeft=2', () => {
+  // 41 = S1 + D20: with 2 darts left show S1
+  assert.deepEqual(checkoutHint(41, OUT_MODES.DOUBLE, 2), { segment: 1, multiplier: 1 });
+});
+test('checkoutHint: 2-dart – shows finish dart when dartsLeft=1', () => {
+  // 41 = S1 + D20: with only 1 dart left, still show D20 (best available finish)
+  assert.deepEqual(checkoutHint(41, OUT_MODES.DOUBLE, 1), { segment: 20, multiplier: 2 });
+});
+test('checkoutHint: 3-dart – steps through route', () => {
+  // 170 = T20 + T20 + B2
+  assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 3), { segment: 20, multiplier: 3 });
+  assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 2), { segment: 20, multiplier: 3 });
+  assert.deepEqual(checkoutHint(170, OUT_MODES.DOUBLE, 1), { segment: 25, multiplier: 2 });
+});
+test('checkoutHint: no route for impossible scores', () => {
+  assert.equal(checkoutHint(159, OUT_MODES.DOUBLE, 3), null);
+  assert.equal(checkoutHint(169, OUT_MODES.DOUBLE, 3), null);
+});
+test('checkoutHint: straight out hints', () => {
+  assert.deepEqual(checkoutHint(20, OUT_MODES.STRAIGHT, 1), { segment: 20, multiplier: 1 });
+  assert.deepEqual(checkoutHint(40, OUT_MODES.STRAIGHT, 1), { segment: 20, multiplier: 2 });
+  assert.deepEqual(checkoutHint(60, OUT_MODES.STRAIGHT, 1), { segment: 20, multiplier: 3 });
+  assert.deepEqual(checkoutHint(50, OUT_MODES.STRAIGHT, 1), { segment: 25, multiplier: 2 });
+  assert.deepEqual(checkoutHint(25, OUT_MODES.STRAIGHT, 1), { segment: 25, multiplier: 1 });
+  assert.equal(checkoutHint(171, OUT_MODES.STRAIGHT, 3), null);
 });
