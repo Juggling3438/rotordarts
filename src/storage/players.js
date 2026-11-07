@@ -121,6 +121,46 @@ export function createPlayerStore({ storage = getDefaultStorage(), idGenerator =
   return { list, add, rename, remove, get, move };
 }
 
+export const SOUNDS_KEY = 'rotordarts.sounds';
+/** Events a player can assign a sound to. */
+export const SOUND_EVENTS = Object.freeze(['t20', 'bull', 'out']);
+
+/**
+ * Per-player sound choice: { [playerId]: { t20, bull, out } } with a sound id or null (no sound).
+ * Kept separate from the player objects so the player format stays unchanged.
+ */
+export function createSoundStore({ storage = getDefaultStorage() } = {}) {
+  function all() {
+    const data = readJson(storage, SOUNDS_KEY, {});
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  }
+
+  /** Sound ids for a player, one entry per event (null = no sound). */
+  function get(playerId) {
+    const entry = all()[playerId] ?? {};
+    return Object.fromEntries(
+      SOUND_EVENTS.map((event) => [event, typeof entry[event] === 'string' ? entry[event] : null]),
+    );
+  }
+
+  function set(playerId, event, soundId) {
+    if (!SOUND_EVENTS.includes(event)) throw new Error(`Unknown sound event: ${event}`);
+    const data = all();
+    data[playerId] = { ...get(playerId), [event]: soundId || null };
+    storage.setItem(SOUNDS_KEY, JSON.stringify(data));
+    return data[playerId];
+  }
+
+  function remove(playerId) {
+    const data = all();
+    if (!(playerId in data)) return;
+    delete data[playerId];
+    storage.setItem(SOUNDS_KEY, JSON.stringify(data));
+  }
+
+  return { get, set, remove };
+}
+
 /** Persist the running game (engine state is plain JSON) so a reload doesn't lose it. */
 export function createGameStore({ storage = getDefaultStorage() } = {}) {
   return {

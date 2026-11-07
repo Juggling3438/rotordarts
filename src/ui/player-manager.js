@@ -2,9 +2,14 @@
  * Player management panel: add, rename, remove, reorder and select the players for the next game.
  * The player store and storage are injected; the selection is persisted under SELECTED_KEY.
  */
-import { createPlayerStore, getDefaultStorage, MAX_NAME_LENGTH } from '../storage/players.js';
+import {
+  createPlayerStore, createSoundStore, getDefaultStorage, MAX_NAME_LENGTH, SOUND_EVENTS,
+} from '../storage/players.js';
+import { SOUND_LIBRARY } from './sound-player.js';
 
 export const SELECTED_KEY = 'rotordarts.selected';
+
+const SOUND_EVENT_LABELS = Object.freeze({ t20: 'T20', bull: 'Bull', out: 'Out' });
 
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -16,10 +21,14 @@ function el(tag, props = {}, ...children) {
 export function createPlayerManager({
   store = createPlayerStore(),
   storage = getDefaultStorage(),
+  soundStore = createSoundStore({ storage }),
+  soundLibrary = SOUND_LIBRARY,
   onChange = () => {},
 } = {}) {
   let editingId = null;
   let error = '';
+  // Players whose sound selection is expanded; survives re-renders.
+  const soundsOpen = new Set();
 
   function loadSelected() {
     try {
@@ -58,6 +67,24 @@ export function createPlayerManager({
   }
 
   const element = el('section', { className: 'player-manager' });
+
+  /** One select per sound event; the empty option means "no sound". */
+  function soundPicker(player) {
+    const chosen = soundStore.get(player.id);
+    const wrap = el('div', { className: 'pm-sounds', id: `pm-sounds-${player.id}`, hidden: !soundsOpen.has(player.id) });
+    for (const event of SOUND_EVENTS) {
+      const select = el('select', { ariaLabel: `${SOUND_EVENT_LABELS[event]} sound for ${player.name}` },
+        el('option', { value: '', textContent: 'No sound' }),
+        ...soundLibrary.map((s) => el('option', { value: s.id, textContent: s.label })),
+      );
+      // A stored id whose file was removed from the library falls back to "no sound".
+      select.value = soundLibrary.some((s) => s.id === chosen[event]) ? chosen[event] : '';
+      select.addEventListener('change', () => soundStore.set(player.id, event, select.value));
+      wrap.append(el('label', { className: 'pm-sound' },
+        el('span', { textContent: SOUND_EVENT_LABELS[event] }), select));
+    }
+    return wrap;
+  }
 
   function render() {
     const players = store.list();
@@ -113,14 +140,32 @@ export function createPlayerManager({
         b.addEventListener('click', handler);
         return b;
       };
+      const sounds = soundPicker(p);
+      const soundsToggle = btn('Sounds', '🔊', () => {
+        const open = sounds.hidden;
+        sounds.hidden = !open;
+        soundsToggle.setAttribute('aria-expanded', String(open));
+        if (open) soundsOpen.add(p.id);
+        else soundsOpen.delete(p.id);
+      });
+      soundsToggle.classList.add('pm-sounds-toggle');
+      soundsToggle.setAttribute('aria-expanded', String(!sounds.hidden));
+      soundsToggle.setAttribute('aria-controls', sounds.id);
       li.append(
         el('span', { className: 'pm-actions' },
           btn('Move up', '↑', () => attempt(() => store.move(p.id, i - 1)), i === 0),
           btn('Move down', '↓', () => attempt(() => store.move(p.id, i + 1)), i === players.length - 1),
           btn('Rename', '✎', () => { editingId = p.id; render(); }),
-          btn('Remove', '✕', () => attempt(() => store.remove(p.id))),
+          soundsToggle,
+          btn('Remove', '✕', () => attempt(() => {
+            if (store.remove(p.id)) {
+              soundStore.remove(p.id);
+              soundsOpen.delete(p.id);
+            }
+          })),
         ),
       );
+      li.append(sounds);
       list.append(li);
     });
 

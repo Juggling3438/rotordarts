@@ -1,12 +1,15 @@
 import { createGame, throwDart, undoDart, dart, checkoutHint, DARTS_PER_TURN } from './engine/darts-engine.js';
-import { createGameStore } from './storage/players.js';
+import { createGameStore, createSoundStore } from './storage/players.js';
 import { createDartboard } from './ui/dartboard.js';
 import { createPlayerManager } from './ui/player-manager.js';
 import { createRulesMenu, describeRules } from './ui/rules-menu.js';
 import { createScoreboard } from './ui/scoreboard.js';
+import { createSoundPlayer, soundEventForDart } from './ui/sound-player.js';
 
 const $ = (id) => document.getElementById(id);
 const gameStore = createGameStore();
+const soundStore = createSoundStore();
+const soundPlayer = createSoundPlayer();
 const scoreboard = createScoreboard();
 $('scoreboard').append(scoreboard.element);
 
@@ -19,7 +22,7 @@ $('board').append(board.element);
 
 // --- setup screen ---
 const startButton = $('start');
-const players = createPlayerManager({ onChange: (sel) => { startButton.disabled = sel.length === 0; } });
+const players = createPlayerManager({ soundStore, onChange: (sel) => { startButton.disabled = sel.length === 0; } });
 const rulesMenu = createRulesMenu({ onChange: (_rules, hintsEnabled) => { if (state) updateHint(hintsEnabled); } });
 $('setup-players').append(players.element);
 $('setup-rules').append(rulesMenu.element);
@@ -65,7 +68,10 @@ function handleThrow(d, point) {
     if (point) board.addMarker(point); // the board already drew it before the wipe
   }
   const turnsBefore = state.turns.length;
+  const thrower = state.players[state.currentPlayerIndex];
   state = throwDart(state, d);
+  const event = soundEventForDart(d);
+  if (event) soundPlayer.play(soundStore.get(thrower.id)[event]);
   clearOnNext = state.turns.length > turnsBefore;
   gameStore.save(state);
   render();

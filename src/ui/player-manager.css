@@ -19,8 +19,15 @@
 .pm-error { color: #ff9a96; min-height: 1.2em; margin: .4rem 0; font-size: .9rem; }
 .pm-empty { color: #aab; margin: 0; }
 .pm-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
-.pm-player { display: flex; align-items: center; gap: .6rem; padding: .35rem .5rem; background: #2e333b; }
+.pm-player { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .35rem .5rem; background: #2e333b; }
+.pm-sounds { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: .4rem .8rem; padding-left: 1.6rem; font-size: .85rem; color: #aab; }
+.pm-sound { display: flex; align-items: center; gap: .3rem; }
+.pm-sound select {
+  font: inherit; color: #eee; padding: .15rem .3rem;
+  background: #383e48; border: 1px solid var(--pm-line);
+}
 .pm-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pm-actions { display: flex; gap: .25rem; }
 .pm-actions button { padding: .2rem .5rem; }
+.pm-actions .pm-sounds-toggle[aria-expanded="true"] { background: var(--pm-ok); }
 .pm-actions button:last-child:hover { background: var(--pm-accent); }
