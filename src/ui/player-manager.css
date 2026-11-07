@@ -14,7 +14,10 @@
   background: #2e333b; border: 1px solid var(--pm-line);
   touch-action: manipulation; /* no double-tap zoom on mobile */
 }
-.player-manager button:hover:not(:disabled) { background: var(--pm-ok); }
+/* Only on devices with a real pointer: on touch screens :hover sticks after a tap. */
+@media (hover: hover) {
+  .player-manager button:hover:not(:disabled) { background: var(--pm-ok); }
+}
 .player-manager button:disabled { opacity: .35; cursor: default; }
 .pm-error { color: #ff9a96; min-height: 1.2em; margin: .4rem 0; font-size: .9rem; }
 .pm-empty { color: #aab; margin: 0; }
@@ -30,4 +33,6 @@
 .pm-actions { display: flex; gap: .25rem; }
 .pm-actions button { padding: .2rem .5rem; }
 .pm-actions .pm-sounds-toggle[aria-expanded="true"] { background: var(--pm-ok); }
-.pm-actions button:last-child:hover { background: var(--pm-accent); }
+@media (hover: hover) {
+  .pm-actions button:last-child:hover { background: var(--pm-accent); }
+}
